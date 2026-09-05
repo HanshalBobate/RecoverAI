@@ -42,8 +42,9 @@ export function PipelineStepper({
     subtitle: payment.failure_reason ? payment.failure_reason.replace('_', ' ') : 'N/A',
     status: 'complete' as const,
     badge: `Attempt #${payment.attempt_count}`,
-    badgeColor: 'text-slate-400 border-slate-700 bg-slate-800/80',
-    icon: <Database className="w-3.5 h-3.5 text-slate-300" />,
+    accentColor: 'var(--accent-sage)',
+    accentLight: 'var(--accent-sage-light)',
+    icon: <Database style={{ width: 12, height: 12, color: 'var(--accent-sage)' }} />,
   };
 
   // Step 2: Diagnose (AI)
@@ -52,20 +53,27 @@ export function PipelineStepper({
   const step2 = {
     title: '2. Diagnose',
     subtitle: isAiLoading
-      ? 'Analyzing...'
+      ? 'Analyzing…'
       : rec
       ? `${Math.round(rec.confidence * 100)}% Conf`
       : 'Rule Engine',
     status: isAiLoading ? ('loading' as const) : hasAi ? ('complete' as const) : ('ready' as const),
     badge: rec ? rec.risk_level.toUpperCase() : 'HEURISTIC',
-    badgeColor: rec
+    accentColor: rec
       ? rec.risk_level === 'low'
-        ? 'text-emerald-300 border-emerald-500/30 bg-emerald-950/40'
+        ? 'var(--accent-sage)'
         : rec.risk_level === 'medium'
-        ? 'text-amber-300 border-amber-500/30 bg-amber-950/40'
-        : 'text-rose-300 border-rose-500/30 bg-rose-950/40'
-      : 'text-indigo-300 border-indigo-500/30 bg-indigo-950/40',
-    icon: <Sparkles className="w-3.5 h-3.5 text-purple-400" />,
+        ? 'var(--accent-butter)'
+        : 'var(--accent-clay)'
+      : 'var(--accent-lavender)',
+    accentLight: rec
+      ? rec.risk_level === 'low'
+        ? 'var(--accent-sage-light)'
+        : rec.risk_level === 'medium'
+        ? 'var(--accent-butter-light)'
+        : 'var(--accent-clay-light)'
+      : 'var(--accent-lavender-light)',
+    icon: <Sparkles style={{ width: 12, height: 12, color: 'var(--accent-lavender)' }} />,
   };
 
   // Step 3: Policy Gate
@@ -76,13 +84,12 @@ export function PipelineStepper({
     subtitle: isOverridden ? 'Overridden' : 'Approved',
     status: isOverridden ? ('warning' as const) : ('complete' as const),
     badge: policyRule.split(':')[0],
-    badgeColor: isOverridden
-      ? 'text-amber-300 border-amber-500/40 bg-amber-950/40'
-      : 'text-emerald-300 border-emerald-500/30 bg-emerald-950/40',
+    accentColor: isOverridden ? 'var(--accent-butter)' : 'var(--accent-sage)',
+    accentLight: isOverridden ? 'var(--accent-butter-light)' : 'var(--accent-sage-light)',
     icon: isOverridden ? (
-      <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+      <AlertTriangle style={{ width: 12, height: 12, color: 'var(--accent-butter)' }} />
     ) : (
-      <Shield className="w-3.5 h-3.5 text-sky-400" />
+      <Shield style={{ width: 12, height: 12, color: 'var(--accent-sky)' }} />
     ),
   };
 
@@ -113,19 +120,26 @@ export function PipelineStepper({
       : isEligible
       ? 'PASSED'
       : 'MANUAL',
-    badgeColor: isAlreadyRecovered
-      ? 'text-teal-300 border-teal-500/40 bg-teal-950/40'
+    accentColor: isAlreadyRecovered
+      ? 'var(--accent-sky)'
       : isBlocked
-      ? 'text-rose-400 border-rose-500/40 bg-rose-950/40'
+      ? 'var(--accent-clay)'
       : isEligible
-      ? 'text-emerald-300 border-emerald-500/40 bg-emerald-950/40'
-      : 'text-sky-300 border-sky-500/40 bg-sky-950/40',
+      ? 'var(--accent-sage)'
+      : 'var(--accent-sky)',
+    accentLight: isAlreadyRecovered
+      ? 'var(--accent-sky-light)'
+      : isBlocked
+      ? 'var(--accent-clay-light)'
+      : isEligible
+      ? 'var(--accent-sage-light)'
+      : 'var(--accent-sky-light)',
     icon: isBlocked ? (
-      <Lock className="w-3.5 h-3.5 text-rose-400" />
+      <Lock style={{ width: 12, height: 12, color: 'var(--accent-clay)' }} />
     ) : isExecuting ? (
-      <Zap className="w-3.5 h-3.5 text-teal-300 animate-pulse" />
+      <Zap style={{ width: 12, height: 12, color: 'var(--accent-sage)' }} className="animate-pulse" />
     ) : (
-      <Zap className="w-3.5 h-3.5 text-teal-400" />
+      <Zap style={{ width: 12, height: 12, color: 'var(--accent-sage)' }} />
     ),
   };
 
@@ -155,90 +169,210 @@ export function PipelineStepper({
         ? 'RECOVERED'
         : currentResult.status.toUpperCase()
       : 'IDLE',
-    badgeColor: isSucceeded
-      ? 'text-emerald-300 border-emerald-500/50 bg-emerald-950/50'
+    accentColor: isSucceeded
+      ? 'var(--accent-sage)'
       : isFailed
-      ? 'text-rose-300 border-rose-500/50 bg-rose-950/50'
+      ? 'var(--accent-clay)'
       : currentResult
-      ? 'text-sky-300 border-sky-500/50 bg-sky-950/50'
-      : 'text-slate-500 border-slate-700 bg-slate-800/40',
+      ? 'var(--accent-sky)'
+      : 'var(--border-strong)',
+    accentLight: isSucceeded
+      ? 'var(--accent-sage-light)'
+      : isFailed
+      ? 'var(--accent-clay-light)'
+      : currentResult
+      ? 'var(--accent-sky-light)'
+      : 'var(--paper-alt)',
     icon: isSucceeded ? (
-      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+      <CheckCircle2 style={{ width: 12, height: 12, color: 'var(--accent-sage)' }} />
     ) : isFailed ? (
-      <XCircle className="w-3.5 h-3.5 text-rose-400" />
+      <XCircle style={{ width: 12, height: 12, color: 'var(--accent-clay)' }} />
     ) : isCustomerAction ? (
-      <Mail className="w-3.5 h-3.5 text-sky-400" />
+      <Mail style={{ width: 12, height: 12, color: 'var(--accent-sky)' }} />
     ) : (
-      <History className="w-3.5 h-3.5 text-slate-400" />
+      <History style={{ width: 12, height: 12, color: 'var(--ink-muted)' }} />
     ),
   };
 
   const steps = [step1, step2, step3, step4, step5];
 
   return (
-    <div className="rounded-xl border border-slate-800/90 bg-[#0b0e18] p-3 sm:p-4 mb-4">
-      <div className="flex items-center justify-between mb-3 border-b border-slate-800/60 pb-2">
-        <div className="flex items-center gap-2">
-          <div className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-300">
+    <div
+      style={{
+        background: 'var(--paper-alt)',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--radius-medium)',
+        padding: '14px 16px',
+        marginBottom: 16,
+      }}
+    >
+      {/* Header */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: 12,
+          paddingBottom: 10,
+          borderBottom: '1px solid var(--border)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: '50%',
+              background: 'var(--accent-sage)',
+              display: 'inline-block',
+            }}
+            className="animate-pulse"
+          />
+          <span
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: 11,
+              fontWeight: 500,
+              color: 'var(--ink-secondary)',
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase',
+            }}
+          >
             End-to-End Governance Pipeline
           </span>
         </div>
-        <span className="text-[10px] font-mono text-slate-400">
-          Hardware Gate Active &bull; Zero Live Money Movement
+        <span
+          style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: 10,
+            color: 'var(--ink-muted)',
+          }}
+        >
+          Hardware Gate Active · Zero Live Money Movement
         </span>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-2.5">
+      {/* Steps Grid */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(5, 1fr)',
+          gap: 8,
+        }}
+        className="pipeline-steps"
+      >
         {steps.map((step, idx) => {
-          const isComplete = step.status === 'complete';
-          const isWarning = step.status === 'warning';
-          const isBlockedState = step.status === 'blocked';
-          const isError = step.status === 'error';
           const isLoading = step.status === 'loading';
-
-          let borderClass = 'border-slate-800 bg-[#0f1322]';
-          if (isComplete) borderClass = 'border-emerald-500/30 bg-emerald-950/15 shadow-sm shadow-emerald-950/20';
-          if (isWarning) borderClass = 'border-amber-500/40 bg-amber-950/20 shadow-sm shadow-amber-950/20';
-          if (isBlockedState) borderClass = 'border-rose-500/40 bg-rose-950/20';
-          if (isError) borderClass = 'border-rose-500/50 bg-rose-950/30';
-          if (isLoading) borderClass = 'border-purple-500/40 bg-purple-950/20 animate-pulse';
-
           return (
             <div
               key={step.title}
-              className={`rounded-lg border p-2.5 transition-all relative flex flex-col justify-between ${borderClass}`}
+              style={{
+                position: 'relative',
+                background: 'var(--paper)',
+                border: '1px solid var(--border)',
+                borderTop: `3px solid ${step.accentColor}`,
+                borderRadius: 'var(--radius-medium)',
+                padding: '10px 10px 8px',
+                transition: 'box-shadow 0.15s ease',
+                opacity: isLoading ? 0.7 : 1,
+              }}
+              className={isLoading ? 'animate-pulse' : undefined}
             >
-              <div>
-                <div className="flex items-center justify-between gap-1 mb-1">
-                  <div className="flex items-center gap-1.5">
-                    {step.icon}
-                    <span className="font-semibold text-[11px] text-slate-200 tracking-tight">
-                      {step.title}
-                    </span>
-                  </div>
+              {/* Title row */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 4,
+                  marginBottom: 4,
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  {step.icon}
                   <span
-                    className={`font-mono text-[9px] px-1.5 py-0.2 rounded border font-bold ${step.badgeColor}`}
+                    style={{
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: 10,
+                      fontWeight: 500,
+                      color: 'var(--ink-secondary)',
+                      lineHeight: 1.2,
+                    }}
                   >
-                    {step.badge}
+                    {step.title}
                   </span>
-                </div>
-
-                <div className="text-[11px] font-medium text-slate-300 capitalize truncate mt-1">
-                  {step.subtitle}
                 </div>
               </div>
 
-              {/* Connecting arrow for desktop, except last step */}
+              {/* Badge */}
+              <span
+                style={{
+                  display: 'inline-block',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: 9,
+                  fontWeight: 500,
+                  color: step.accentColor,
+                  background: step.accentLight,
+                  borderLeft: `2px solid ${step.accentColor}`,
+                  borderRadius: 'var(--radius-subtle)',
+                  padding: '1px 5px',
+                  letterSpacing: '0.04em',
+                  marginBottom: 4,
+                }}
+              >
+                {step.badge}
+              </span>
+
+              {/* Subtitle */}
+              <div
+                style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: 11,
+                  fontWeight: 400,
+                  color: 'var(--ink-muted)',
+                  lineHeight: 1.3,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  textTransform: 'capitalize',
+                }}
+              >
+                {step.subtitle}
+              </div>
+
+              {/* Connecting arrow (hidden on mobile via CSS) */}
               {idx < 4 && (
-                <div className="hidden sm:block absolute -right-2 top-1/2 -translate-y-1/2 z-10 text-slate-600 pointer-events-none">
-                  <ArrowRight className="w-3 h-3 text-slate-600" />
+                <div
+                  style={{
+                    position: 'absolute',
+                    right: -10,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    zIndex: 10,
+                    color: 'var(--border-strong)',
+                    pointerEvents: 'none',
+                  }}
+                  className="pipeline-arrow"
+                >
+                  <ArrowRight style={{ width: 10, height: 10 }} />
                 </div>
               )}
             </div>
           );
         })}
       </div>
+
+      {/* Mobile: 2-column fallback via inline style — handled by responsive grid below */}
+      <style>{`
+        @media (max-width: 640px) {
+          .pipeline-steps {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .pipeline-arrow {
+            display: none !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

@@ -127,7 +127,7 @@ export function getPaymentById(paymentId: string): PaymentRecord | null {
   const db = getDb();
   const stmt = db.prepare('SELECT * FROM payments WHERE payment_id = ?');
   const record = stmt.get(paymentId) as unknown as PaymentRecord | undefined;
-  return record || null;
+  return record ? { ...record } : null;
 }
 
 export function getAtRiskPayments(): PaymentRecord[] {

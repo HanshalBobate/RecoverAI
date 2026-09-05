@@ -1,37 +1,86 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { PaymentRecord } from '@/lib/types';
 import { formatINR, formatFailureReason, formatDate } from '@/lib/format';
 import { StatusBadge } from './StatusBadge';
-import { ChevronRight, CreditCard, Smartphone, Globe } from 'lucide-react';
+import { ChevronRight, CreditCard, Smartphone, Globe, AlertCircle } from 'lucide-react';
 
 interface PaymentsTableProps {
   payments: PaymentRecord[];
-  onSelectPayment: (payment: PaymentRecord) => void;
   isLoading?: boolean;
 }
 
 export function PaymentsTable({
   payments,
-  onSelectPayment,
   isLoading = false,
 }: PaymentsTableProps) {
+  const router = useRouter();
+
   if (isLoading) {
     return (
-      <div className="rounded-xl border border-slate-800 bg-[#0d0f17] p-12 text-center">
-        <div className="inline-block h-8 w-8 animate-spin rounded-full border-2 border-rose-500 border-t-transparent" />
-        <p className="mt-3 text-sm text-slate-400">Loading payments ledger...</p>
+      <div
+        style={{
+          background: 'var(--paper)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--radius-medium)',
+          padding: '56px 24px',
+          textAlign: 'center',
+          boxShadow: 'var(--shadow-surface)',
+        }}
+      >
+        <div
+          style={{
+            display: 'inline-block',
+            width: 28,
+            height: 28,
+            borderRadius: '50%',
+            border: '2px solid var(--accent-clay)',
+            borderTopColor: 'transparent',
+          }}
+          className="animate-spin"
+        />
+        <p style={{ marginTop: 12, fontSize: 13, color: 'var(--ink-secondary)', fontFamily: 'var(--font-sans)' }}>
+          Loading payments ledger…
+        </p>
       </div>
     );
   }
 
   if (payments.length === 0) {
     return (
-      <div className="rounded-xl border border-slate-800 bg-[#0d0f17] p-12 text-center">
-        <p className="text-base font-medium text-slate-300">No payment records found</p>
-        <p className="mt-1 text-xs text-slate-500">
-          Try adjusting your search criteria or filter selections.
+      <div
+        style={{
+          background: 'var(--paper)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--radius-medium)',
+          padding: '56px 24px',
+          textAlign: 'center',
+          boxShadow: 'var(--shadow-surface)',
+        }}
+      >
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 40,
+            height: 40,
+            borderRadius: '50%',
+            background: 'var(--accent-clay-light)',
+            color: 'var(--accent-clay)',
+            margin: '0 auto 12px',
+          }}
+        >
+          <AlertCircle style={{ width: 20, height: 20 }} />
+        </div>
+        <p style={{ fontSize: 14, fontWeight: 500, color: 'var(--ink)', fontFamily: 'var(--font-sans)' }}>
+          No payment records match the current criteria
+        </p>
+        <p style={{ marginTop: 4, fontSize: 12, color: 'var(--ink-muted)', fontFamily: 'var(--font-sans)' }}>
+          Try clearing search filters or changing status tabs.
         </p>
       </div>
     );
@@ -40,143 +89,274 @@ export function PaymentsTable({
   const getMethodIcon = (type: string) => {
     switch (type) {
       case 'upi':
-        return <Smartphone className="w-3.5 h-3.5 text-emerald-400" />;
+        return <Smartphone style={{ width: 12, height: 12, color: 'var(--accent-sage)' }} />;
       case 'netbanking':
-        return <Globe className="w-3.5 h-3.5 text-sky-400" />;
+        return <Globe style={{ width: 12, height: 12, color: 'var(--accent-sky)' }} />;
       default:
-        return <CreditCard className="w-3.5 h-3.5 text-indigo-400" />;
+        return <CreditCard style={{ width: 12, height: 12, color: 'var(--accent-lavender)' }} />;
     }
   };
 
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-800 bg-[#0d0f17] shadow-xl">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-xs text-slate-300">
-          <thead className="border-b border-slate-800 bg-[#121622] text-[11px] uppercase tracking-wider text-slate-400">
-            <tr>
-              <th scope="col" className="px-5 py-3.5 font-semibold">
-                Customer
-              </th>
-              <th scope="col" className="px-4 py-3.5 font-semibold">
-                Payment ID
-              </th>
-              <th scope="col" className="px-4 py-3.5 font-semibold text-right">
-                Amount
-              </th>
-              <th scope="col" className="px-4 py-3.5 font-semibold text-center">
-                Status
-              </th>
-              <th scope="col" className="px-4 py-3.5 font-semibold">
-                Failure Reason
-              </th>
-              <th scope="col" className="px-4 py-3.5 font-semibold text-center">
-                Attempts
-              </th>
-              <th scope="col" className="px-4 py-3.5 font-semibold">
-                Last Attempt
-              </th>
-              <th scope="col" className="px-4 py-3.5 font-semibold text-center">
-                <span className="sr-only">Inspect</span>
-              </th>
+    <div
+      style={{
+        background: 'var(--paper)',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--radius-medium)',
+        overflow: 'hidden',
+        boxShadow: 'var(--shadow-surface)',
+      }}
+    >
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
+          {/* Table Head */}
+          <thead>
+            <tr
+              style={{
+                background: 'var(--paper-alt)',
+                borderBottom: '1px solid var(--border)',
+              }}
+            >
+              {['Customer', 'Payment ID', 'Amount', 'Status', 'Failure Reason', 'Attempts', 'Last Attempt', ''].map((h, i) => (
+                <th
+                  key={h || i}
+                  scope="col"
+                  style={{
+                    padding: '10px 16px',
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: '10px',
+                    fontWeight: 500,
+                    color: 'var(--ink-muted)',
+                    letterSpacing: '0.06em',
+                    textTransform: 'uppercase',
+                    textAlign: i === 2 ? 'right' : i === 3 ? 'center' : i === 5 ? 'center' : 'left',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {h || <span className="sr-only">Inspect Action</span>}
+                </th>
+              ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/60">
-            {payments.map((p) => {
+
+          {/* Table Body */}
+          <tbody>
+            {payments.map((p, rowIdx) => {
               const isAtRisk = p.status === 'failed' || p.status === 'abandoned';
+              const isLast = rowIdx === payments.length - 1;
               return (
                 <tr
                   key={p.payment_id}
-                  onClick={() => onSelectPayment(p)}
-                  className="group cursor-pointer transition-colors duration-150 hover:bg-slate-800/40"
+                  tabIndex={0}
+                  role="link"
+                  aria-label={`Inspect payment ${p.payment_id} for ${p.customer_name}, amount ${formatINR(p.amount)}, status ${p.status}`}
+                  onClick={() => router.push(`/payments/${p.payment_id}`)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      router.push(`/payments/${p.payment_id}`);
+                    }
+                  }}
+                  style={{
+                    borderBottom: isLast ? 'none' : '1px solid var(--border)',
+                    cursor: 'pointer',
+                    transition: 'background 0.1s',
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLElement).style.background = 'var(--paper-alt)';
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.background = 'transparent';
+                  }}
                 >
                   {/* Customer */}
-                  <td className="px-5 py-3.5">
-                    <div className="flex items-center gap-2.5">
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-800 text-xs font-semibold text-slate-200 border border-slate-700">
-                        {p.customer_name
-                          .split(' ')
-                          .map((n) => n[0])
-                          .join('')
-                          .slice(0, 2)}
+                  <td style={{ padding: '12px 16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div
+                        style={{
+                          width: 30,
+                          height: 30,
+                          borderRadius: '50%',
+                          background: 'var(--paper-fold)',
+                          border: '1px solid var(--border)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontFamily: 'var(--font-editorial)',
+                          fontSize: 13,
+                          fontWeight: 600,
+                          color: 'var(--ink-secondary)',
+                          flexShrink: 0,
+                          lineHeight: 1,
+                        }}
+                      >
+                        {p.customer_name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
                       </div>
                       <div>
-                        <div className="font-medium text-white group-hover:text-rose-300 transition-colors">
+                        <div
+                          style={{
+                            fontFamily: 'var(--font-sans)',
+                            fontSize: 13,
+                            fontWeight: 500,
+                            color: 'var(--ink)',
+                            lineHeight: 1.3,
+                          }}
+                        >
                           {p.customer_name}
                         </div>
-                        <div className="text-[11px] text-slate-400 font-mono">
+                        <div
+                          style={{
+                            fontFamily: 'var(--font-mono)',
+                            fontSize: 10,
+                            color: 'var(--ink-muted)',
+                            marginTop: 1,
+                          }}
+                        >
                           {p.customer_email}
                         </div>
                       </div>
                     </div>
                   </td>
 
-                  {/* Payment ID & Channel */}
-                  <td className="px-4 py-3.5">
-                    <div className="font-mono text-[11px] text-slate-300 font-medium">
+                  {/* Payment ID & Method */}
+                  <td style={{ padding: '12px 16px' }}>
+                    <div
+                      style={{
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: 11,
+                        fontWeight: 500,
+                        color: 'var(--ink-secondary)',
+                        lineHeight: 1.3,
+                      }}
+                    >
                       {p.payment_id}
                     </div>
-                    <div className="flex items-center gap-1 text-[10px] text-slate-400 mt-0.5">
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 4,
+                        marginTop: 3,
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: 10,
+                        color: 'var(--ink-muted)',
+                      }}
+                    >
                       {getMethodIcon(p.payment_method_type)}
-                      <span className="truncate max-w-[140px]">
+                      <span style={{ maxWidth: 130, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {p.payment_method_detail || p.payment_method_type.toUpperCase()}
                       </span>
                     </div>
                   </td>
 
                   {/* Amount */}
-                  <td className="px-4 py-3.5 text-right">
+                  <td style={{ padding: '12px 16px', textAlign: 'right' }}>
                     <div
-                      className={`font-mono text-sm font-bold ${
-                        isAtRisk ? 'text-rose-300' : 'text-slate-100'
-                      }`}
+                      style={{
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: isAtRisk ? 'var(--accent-clay)' : 'var(--ink)',
+                        lineHeight: 1.3,
+                      }}
                     >
                       {formatINR(p.amount)}
                     </div>
-                    <div className="text-[10px] text-slate-400">INR</div>
+                    <div style={{ fontFamily: 'var(--font-sans)', fontSize: 10, color: 'var(--ink-muted)', marginTop: 1 }}>
+                      {p.currency}
+                    </div>
                   </td>
 
                   {/* Status */}
-                  <td className="px-4 py-3.5 text-center">
+                  <td style={{ padding: '12px 16px', textAlign: 'center' }}>
                     <StatusBadge status={p.status} />
                   </td>
 
                   {/* Failure Reason */}
-                  <td className="px-4 py-3.5">
+                  <td style={{ padding: '12px 16px' }}>
                     {p.failure_reason ? (
-                      <span className="inline-flex items-center gap-1.5 font-medium text-slate-200">
-                        <span className="h-1.5 w-1.5 rounded-full bg-rose-400" />
+                      <span
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 6,
+                          fontFamily: 'var(--font-sans)',
+                          fontSize: 12,
+                          fontWeight: 400,
+                          color: 'var(--ink-secondary)',
+                        }}
+                      >
+                        <span
+                          style={{
+                            width: 5,
+                            height: 5,
+                            borderRadius: '50%',
+                            backgroundColor: 'var(--accent-clay)',
+                            flexShrink: 0,
+                          }}
+                        />
                         {formatFailureReason(p.failure_reason)}
                       </span>
                     ) : (
-                      <span className="text-slate-400 italic">None</span>
+                      <span style={{ fontFamily: 'var(--font-sans)', fontSize: 12, color: 'var(--ink-faint)', fontStyle: 'italic' }}>
+                        None
+                      </span>
                     )}
                   </td>
 
                   {/* Attempts */}
-                  <td className="px-4 py-3.5 text-center">
+                  <td style={{ padding: '12px 16px', textAlign: 'center' }}>
                     <span
-                      className={`inline-block rounded px-2 py-0.5 font-mono text-[11px] ${
-                        p.attempt_count > 2
-                          ? 'bg-rose-950/40 text-rose-300 border border-rose-800/40'
-                          : 'bg-slate-800 text-slate-300'
-                      }`}
+                      style={{
+                        display: 'inline-block',
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: 11,
+                        fontWeight: 400,
+                        padding: '2px 8px',
+                        borderRadius: 'var(--radius-subtle)',
+                        background: p.attempt_count > 1 ? 'var(--accent-clay-light)' : 'var(--paper-alt)',
+                        color: p.attempt_count > 1 ? 'var(--accent-clay)' : 'var(--ink-secondary)',
+                        borderLeft: p.attempt_count > 1 ? '2px solid var(--accent-clay)' : '2px solid var(--border)',
+                      }}
                     >
                       {p.attempt_count} {p.attempt_count === 1 ? 'try' : 'tries'}
                     </span>
                   </td>
 
                   {/* Last Attempt */}
-                  <td className="px-4 py-3.5 text-slate-400 font-mono text-[11px]">
+                  <td
+                    style={{
+                      padding: '12px 16px',
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: 11,
+                      color: 'var(--ink-muted)',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
                     {formatDate(p.last_attempt_at)}
                   </td>
 
-                  {/* Action arrow */}
-                  <td className="px-4 py-3.5 text-right">
-                    <div className="flex justify-end">
-                      <span className="rounded p-1 text-slate-400 group-hover:bg-slate-700 group-hover:text-white transition-colors">
-                        <ChevronRight className="w-4 h-4" />
-                      </span>
-                    </div>
+                  {/* Inspect link */}
+                  <td style={{ padding: '12px 12px 12px 8px', textAlign: 'right' }}>
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 3,
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: 11,
+                        fontWeight: 500,
+                        color: 'var(--ink-muted)',
+                        padding: '4px 8px',
+                        borderRadius: 'var(--radius-subtle)',
+                        background: 'var(--paper-alt)',
+                        border: '1px solid var(--border)',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      Inspect
+                      <ChevronRight style={{ width: 12, height: 12 }} />
+                    </span>
                   </td>
                 </tr>
               );

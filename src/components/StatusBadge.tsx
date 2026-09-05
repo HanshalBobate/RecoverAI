@@ -8,38 +8,74 @@ interface StatusBadgeProps {
 }
 
 export function StatusBadge({ status, size = 'sm' }: StatusBadgeProps) {
-  let colorStyles = '';
-  let dotColor = '';
+  // Left-border strip style: light tinted background + colored left border + ink text
+  const styleMap: Record<string, { borderColor: string; bg: string; dotColor: string; textColor: string; pulse?: boolean }> = {
+    failed: {
+      borderColor: 'var(--accent-clay)',
+      bg: 'var(--accent-clay-light)',
+      dotColor: 'var(--accent-clay)',
+      textColor: 'var(--accent-clay)',
+      pulse: true,
+    },
+    abandoned: {
+      borderColor: 'var(--accent-butter)',
+      bg: 'var(--accent-butter-light)',
+      dotColor: 'var(--accent-butter)',
+      textColor: 'var(--accent-butter)',
+    },
+    pending: {
+      borderColor: 'var(--accent-sky)',
+      bg: 'var(--accent-sky-light)',
+      dotColor: 'var(--accent-sky)',
+      textColor: 'var(--accent-sky)',
+    },
+    successful: {
+      borderColor: 'var(--accent-sage)',
+      bg: 'var(--accent-sage-light)',
+      dotColor: 'var(--accent-sage)',
+      textColor: 'var(--accent-sage)',
+    },
+  };
 
-  switch (status) {
-    case 'failed':
-      colorStyles = 'bg-rose-500/10 text-rose-400 border-rose-500/30';
-      dotColor = 'bg-rose-400 animate-pulse';
-      break;
-    case 'abandoned':
-      colorStyles = 'bg-amber-500/10 text-amber-400 border-amber-500/30';
-      dotColor = 'bg-amber-400';
-      break;
-    case 'pending':
-      colorStyles = 'bg-sky-500/10 text-sky-400 border-sky-500/30';
-      dotColor = 'bg-sky-400';
-      break;
-    case 'successful':
-      colorStyles = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
-      dotColor = 'bg-emerald-400';
-      break;
-    default:
-      colorStyles = 'bg-slate-500/10 text-slate-400 border-slate-500/30';
-      dotColor = 'bg-slate-400';
-  }
+  const theme = styleMap[status] || {
+    borderColor: 'var(--border-strong)',
+    bg: 'var(--paper-alt)',
+    dotColor: 'var(--ink-muted)',
+    textColor: 'var(--ink-muted)',
+  };
 
-  const sizeStyles = size === 'sm' ? 'px-2 py-0.5 text-[11px]' : 'px-2.5 py-1 text-xs';
+  const fontSize = size === 'sm' ? '10px' : '11px';
+  const padding = size === 'sm' ? '2px 8px 2px 6px' : '3px 10px 3px 8px';
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 font-medium uppercase tracking-wider rounded-md border ${sizeStyles} ${colorStyles}`}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '5px',
+        fontFamily: 'var(--font-sans)',
+        fontSize,
+        fontWeight: 500,
+        letterSpacing: '0.04em',
+        textTransform: 'uppercase',
+        color: theme.textColor,
+        background: theme.bg,
+        borderLeft: `2px solid ${theme.borderColor}`,
+        borderRadius: 'var(--radius-subtle)',
+        padding,
+        whiteSpace: 'nowrap',
+      }}
     >
-      <span className={`w-1.5 h-1.5 rounded-full ${dotColor}`} />
+      <span
+        style={{
+          width: '5px',
+          height: '5px',
+          borderRadius: '50%',
+          backgroundColor: theme.dotColor,
+          flexShrink: 0,
+        }}
+        className={theme.pulse ? 'animate-pulse' : undefined}
+      />
       {formatStatus(status)}
     </span>
   );

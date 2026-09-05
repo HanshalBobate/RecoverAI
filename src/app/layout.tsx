@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { AppShell } from '@/components/AppShell';
 
 export const metadata: Metadata = {
-  title: 'RecoverAI — AI Revenue Recovery Controller',
-  description: 'AI Revenue Recovery Controller for merchants. Detects revenue at risk, monitors checkout failures, and automates intervention.',
+  title: 'RecoverAI — Operations Console',
+  description: 'AI Revenue Recovery Operations Console. Detect, diagnose, and recover failed payments with policy-gated execution.',
 };
 
 export default function RootLayout({
@@ -12,9 +13,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className="min-h-screen bg-[#08090d] text-slate-100 antialiased selection:bg-rose-500/30 selection:text-rose-200">
-        {children}
+    <html lang="en">
+      <body className="antialiased">
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );

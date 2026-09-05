@@ -382,20 +382,20 @@ The RecoverAI operations console is built with **Next.js 15 App Router**, **Reac
 └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Visual Components
-- **Visual 5-Stage Pipeline Stepper (`src/components/PipelineStepper.tsx`)**:
-  Renders real-time stage progression across the top of the payment inspector modal:
-  1. *Detect* &rarr; Failure telemetry & error codes
-  2. *Diagnose* &rarr; AI reasoning & calibrated confidence
-  3. *Policy Gate* &rarr; Deterministic rule evaluation (`POL-001` to `POL-100`)
-  4. *Execution Gate* &rarr; Pre-execution eligibility (`PASSED`, `BLOCKED`, `ALREADY_RECOVERED`)
-  5. *Audit Ledger* &rarr; Real-time outcome status (`+₹14,999 Recovered`, `Blocked`, `Escalated`)
-- **Interactive Payment Inspector (`src/components/PaymentDetailModal.tsx`)**:
-  Full-screen audit modal with tabbed views: Telemetry, AI Diagnosis, Policy Decision, Pre-Execution Preview, One-Click Execution Button, and Complete Audit Log.
-- **Executive Metric Cards (`src/components/MetricCard.tsx`)**:
-  Real-time KPI cards displaying Revenue at Risk, Recovered Revenue, Potential Recoverable, and Recovery Success Rates.
-- **Accounting Audit Modal**:
-  Dedicated modal explaining the exact mathematical derivation of recovered revenue and verifying SQLite database integrity.
+### Multi-Route Operations Console Architecture
+- **Global Application Shell (`src/components/AppShell.tsx`)**:
+  Sticky top navigation, active route highlights, persistent status chips (`AI: MOCK`, `MODE: TEST`, `POLICY: ENFORCED`, `IDEMPOTENT`), and responsive layout wrapper.
+- **Command Center (`/`)**:
+  Real-time executive posture (5 KPI cards), High-Value At-Risk Cohort inspection queue, interactive Evaluator Scenarios (01–05), and live recovery activity feed.
+- **Payments Investigation Workspace (`/payments`)**:
+  Operational search, status tabs, failure reason filters, and accessible table with clickable rows navigating directly to `/payments/[id]`.
+- **Payment Lifecycle Inspector (`/payments/[id]`)**:
+  Dedicated transaction lifecycle narrative: Payment &rarr; Context &rarr; AI Diagnosis &rarr; Policy Decision &rarr; Execution Gate &rarr; Outcome &rarr; Audit. Features the Visual Equation Banner ($\text{AI} \neq \text{Policy} \neq \text{Outcome}$), explicit Policy Override presentation, pre-execution briefing, and double-click guard.
+- **Recovery Operations Workspace (`/recovery`)**:
+  Strict separation between AI Risk Triage (predictive cohort inference) and Batch Recovery Execution (policy-gated financial execution), backed by action taxonomy rules and live execution metrics.
+- **Audit Ledger & Governance (`/audit`)**:
+  Immutable source-of-truth execution ledger with cryptographic/deterministic traceability, status/action filtering, and prominent Accounting Invariant callout:
+  $$\text{Recovered Revenue} = \sum_{\text{status} = \text{'succeeded'}} \text{amount\_recovered}$$
 
 ---
 
@@ -522,7 +522,7 @@ RecoverAI/
 ├── tsconfig.json                    # TypeScript compiler configuration (Strict)
 ├── next.config.ts                   # Next.js configuration (Server external packages)
 ├── README.md                        # Project documentation
-├── phase-1.md to phase-5.md         # Detailed architectural documentation per phase
+├── phase-1.md to phase-7.md         # Detailed architectural documentation per phase
 │
 ├── data/
 │   └── recoverai.db                 # Local SQLite database (payments & recovery_executions)
@@ -541,7 +541,16 @@ RecoverAI/
     ├── app/
     │   ├── globals.css              # Dark fintech styling tokens
     │   ├── layout.tsx               # Root layout with Inter font
-    │   ├── page.tsx                 # Operations console & interactive demo dashboard
+    │   ├── page.tsx                 # Command Center (Overview, KPIs, Evaluator Scenarios 01-05)
+    │   ├── payments/
+    │   │   ├── page.tsx             # Payments Investigation Workspace (Search, Status/Reason filters)
+    │   │   └── [id]/
+    │   │       ├── page.tsx         # Payment Lifecycle Inspector Route
+    │   │       └── PaymentDetailClient.tsx # Payment Storytelling, Pre-execution briefing & Outcome
+    │   ├── recovery/
+    │   │   └── page.tsx             # Recovery Operations (AI Risk Triage vs Batch Recovery)
+    │   ├── audit/
+    │   │   └── page.tsx             # Audit Ledger & Governance (Realized revenue formula)
     │   └── api/                     # 13 Next.js REST API routes
     │       ├── payments/
     │       │   ├── route.ts         # GET /api/payments
@@ -559,9 +568,9 @@ RecoverAI/
     │           └── audit/route.ts   # GET /api/recovery/audit
     │
     ├── components/
+    │   ├── AppShell.tsx             # Global application shell with status indicators
     │   ├── MetricCard.tsx           # Executive KPI metric card
-    │   ├── PaymentDetailModal.tsx   # Deep-dive payment evaluation & execution modal
-    │   ├── PaymentsTable.tsx        # Interactive data table with filters and pagination
+    │   ├── PaymentsTable.tsx        # Accessible data table with clickable rows
     │   ├── PipelineStepper.tsx      # Visual 5-stage progress indicator
     │   └── StatusBadge.tsx          # Color-coded financial status badge
     │
